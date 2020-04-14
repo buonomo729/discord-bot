@@ -2,6 +2,7 @@
 import os
 
 import discord
+import csv
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,15 +25,21 @@ async def on_ready():
         f'Channels #{len(guild.channels)}'
     )
 
-    for channel in guild.text_channels:
-        messages = await channel.history(limit=200).filter(lambda m: m.author.name == 'Avrae').flatten()
-        print(
-            f'Channel: {channel.name} - Avrae Message #{len(messages)}'
-        )
-        for m in messages:
-            if len(m.embeds) > 0:
-                print(
-                  f'{m.embeds[0].to_dict()}\n' 
-                )
+    with open('avrae_messages.csv','w',newline='',encoding='utf-8') as csvfile:
+        fieldnames = ['author','fields','color','type','description','title','thumbnail','footer','image']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for channel in guild.text_channels:
+            messages = await channel.history(limit=200).filter(lambda m: m.author.name == 'Avrae').flatten()
+            print(
+                f'Channel: {channel.name} - Avrae Message #{len(messages)}'
+            )
+            for m in messages:
+                if len(m.embeds) > 0:
+                    writer.writerow(m.embeds[0].to_dict())
+                    print(
+                      f'{m.embeds[0].to_dict()}\n' 
+                    )
 
 client.run(TOKEN)

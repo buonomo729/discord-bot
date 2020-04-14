@@ -12,27 +12,27 @@ client = discord.Client()
 
 @client.event
 async def on_ready():
-    bunguild = await client.fetch_guilds(limit=10).find(lambda m: m.name == 'Bun')
+    
+    # following completion of this for..in generator, guild var will be our Bun Discord Guild.
+    for guild in client.guilds:
+        if guild.name == GUILD:
+            break
 
     print(
         f'{client.user} is connected to the following guild:\n'
-        f'{bunguild.name}(id: {bunguild.id})'
+        f'{guild.name}(id: {guild.id})\n'
+        f'Channels #{len(guild.channels)}'
     )
 
-    client.get_all_channels()
-
-    print(
-        f'{len(bunguild.text_channels)}'
-        f'{len(bunguild.channels)}'
-    )
-
-
-    for channel in bunguild.text_channels:
-      messages = await channel.history(limit=200).filter(lambda m: m.author.name == 'Avrae').flatten()
-      for message in messages:
+    for channel in guild.text_channels:
+        messages = await channel.history(limit=200).filter(lambda m: m.author.name == 'Avrae').flatten()
         print(
-            f'{message.content}'
+            f'Channel: {channel.name} - Avrae Message #{len(messages)}'
         )
-      break
+        for m in messages:
+            if len(m.embeds) > 0:
+                print(
+                  f'{m.embeds[0].to_dict()}\n' 
+                )
 
 client.run(TOKEN)
